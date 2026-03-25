@@ -153,7 +153,7 @@ const LogTable = ({ title, data, cols, headers, gridCols }: LogTableProps) => {
   return (
     <div style={{ background: "#110707", border: "1px solid #2a0e0e", borderTop: "2px solid #6a0800", borderRadius: 2, overflow: "hidden" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "7px 11px", borderBottom: "1px solid #2a0e0e", background: "#160909" }}>
-        <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "2.5px", color: "#ff2200", textTransform: "uppercase" }}>{title}</span>
+        <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "2.5px", color: "#ff2200", textTransform: "uppercase" }}>{title}</span>
         <div style={{ display: "flex", alignItems: "center", gap: 4, background: "#080404", border: "1px solid #2a0e0e", borderRadius: 2, padding: "3px 6px" }}>
           <span style={{ color: "#3a2222" }}><SearchIcon /></span>
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="filter..."
@@ -161,15 +161,15 @@ const LogTable = ({ title, data, cols, headers, gridCols }: LogTableProps) => {
         </div>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: gridCols, padding: "5px 11px", borderBottom: "1px solid #2a0e0e" }}>
-        {headers.map(h => <span key={h} style={{ fontSize: 9, color: "#3a2222", letterSpacing: 1, textTransform: "uppercase" }}>{h}</span>)}
+        {headers.map(h => <span key={h} style={{ fontSize: 11, color: "#cc6655", letterSpacing: 1, textTransform: "uppercase" }}>{h}</span>)}
       </div>
       <div style={{ maxHeight: 210, overflowY: "auto" }}>
         {filtered.length === 0
-          ? <div style={{ color: "#3a2222", fontSize: 10, padding: "8px 11px" }}>— no results —</div>
+          ? <div style={{ color: "#cc6655", fontSize: 12, padding: "8px 11px" }}>— no results —</div>
           : filtered.map((row, i) => (
             <div key={i} style={{ display: "grid", gridTemplateColumns: gridCols, padding: "5px 11px", borderBottom: "1px solid rgba(42,14,14,0.4)" }}>
               {cols.map((c, ci) => (
-                <span key={c} style={{ fontSize: 10, color: ci === 0 ? "#00e5b0" : "#007a5e", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                <span key={c} style={{ fontSize: 13, color: ci === 0 ? "#00e5b0" : "#00c490", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                   {row[c]}
                 </span>
               ))}
@@ -563,14 +563,14 @@ export default function App() {
               </div>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 0.85fr 1.4fr", padding: "5px 11px", borderBottom: "1px solid #2a0e0e" }}>
-              {["User", "Login Time", "File Accessed"].map(h => <span key={h} style={{ fontSize: 9, color: "#3a2222", letterSpacing: 1, textTransform: "uppercase" }}>{h}</span>)}
+              {["User", "Login Time", "File Accessed"].map(h => <span key={h} style={{ fontSize: 11, color: "#cc6655", letterSpacing: 1, textTransform: "uppercase" }}>{h}</span>)}
             </div>
             <div style={{ maxHeight: 210, overflowY: "auto" }}>
               {COMBINED.map((row, i) => (
                 <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 0.85fr 1.4fr", padding: "5px 11px", borderBottom: "1px solid rgba(42,14,14,0.4)" }}>
-                  <span style={{ fontSize: 10, color: "#00e5b0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{row.user}</span>
-                  <span style={{ fontSize: 10, color: "#007a5e", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{row.loginTime}</span>
-                  <span style={{ fontSize: 10, color: "#007a5e", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{row.fileAccessed}</span>
+                  <span style={{ fontSize: 13, color: "#00e5b0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{row.user}</span>
+                  <span style={{ fontSize: 13, color: "#00c490", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{row.loginTime}</span>
+                  <span style={{ fontSize: 13, color: "#00c490", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{row.fileAccessed}</span>
                 </div>
               ))}
             </div>
