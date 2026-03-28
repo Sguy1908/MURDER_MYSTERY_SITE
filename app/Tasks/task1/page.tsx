@@ -324,18 +324,35 @@ const GhostPanel = ({ open, onClose, qStatuses, onQStatusChange, onAllDone }: Gh
     if (idx >= QUESTIONS.length) {
       setDone(true);
       setAwaitingAnswer(false);
-      const tid = addTyping(); await delay(700); removeTyping(tid);
-      addMsg("ghost41_id › VERDICT", "✓ All confirmed. Breach fully reconstructed. Access level elevated.");
+
+      const tid = addTyping();
+      await delay(700);
+      removeTyping(tid);
+
+      addMsg(
+        "ghost41_id › VERDICT",
+        "✓ All confirmed. Breach fully reconstructed. Access level elevated."
+      );
+
       onAllDone();
       return;
     }
+
     const q = QUESTIONS[idx];
     setAwaitingAnswer(true);
-    addMsg("ghost41_id › QUERY", q.q);
-    const id = ++idRef.current;
-    setMessages(m => [...m, { id, text: q.hint, label: undefined, isUser: false }]);
-  }, [addMsg, addTyping, removeTyping, onAllDone]);
 
+    addMsg("ghost41_id › QUERY", q.q);
+
+    const id = ++idRef.current;
+
+    const newMessage: ChatMessage = {
+      id,
+      text: q.hint ?? "", // 🔥 prevents undefined crash
+      isUser: false,
+    };
+
+    setMessages((m) => [...m, newMessage]);
+  }, [addMsg, addTyping, removeTyping, onAllDone]);
   useEffect(() => {
     if (open && !started) {
       setStarted(true);
