@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { verifyGhostAnswer } from "@/app/lib/verifyGhostAnswer";
 import { ChatMessage, VerifyResult } from "@/app/types";
 

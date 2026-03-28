@@ -8,7 +8,5 @@ services:
     environment:
       - MONGODB_URI=${MONGODB_URI}
       - JWT_SECRET=${JWT_SECRET}
-    volumes:
-      - .:/app
-      - /app/node_modules
-    command: npm run dev
+      - SHARED_PASSWORD=${SHARED_PASSWORD}
+      - NODE_ENV=production
