@@ -25,12 +25,14 @@ interface VerifyResult {
 }
 
 interface AccessRow {
+  [key: string]: string;
   user: string;
   time: string;
   connection: string;
 }
 
 interface EndpointRow {
+  [key: string]: string;
   user: string;
   time: string;
   action: string;
@@ -38,6 +40,7 @@ interface EndpointRow {
 }
 
 interface VpnRow {
+  [key: string]: string;
   user: string;
   time: string;
   tunnel: string;
