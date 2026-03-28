@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getTask, getQuestion, checkAnswer } from '@/app/lib/ghostAnswers';
 import { getTeam } from '@/app/lib/auth';
+import { VerifyResult } from '@/app/types';
 import crypto from 'crypto';
 
 // ── CryptoJS-compatible AES-256-CBC encryption (OpenSSL "Salted__" format) ──
@@ -49,7 +50,7 @@ export async function POST(req: NextRequest) {
         );
     }
 
-    const { taskId, questionId, answer } = body as {
+    const { taskId, questionId, answer } = (body || {}) as {
         taskId?: string;
         questionId?: string;
         answer?: string;
@@ -80,7 +81,9 @@ export async function POST(req: NextRequest) {
 
     // Update last attempt immediately to prevent concurrent brute force
     team.lastAttempt = now;
-    await (team as any).save();
+    if ('save' in team && typeof team.save === 'function') {
+        await (team as any).save();
+    }
 
     // ── Enforce strict progression ───────────────────────────────────────────
     const taskIndex = parseInt(taskId.replace('task', '')) - 1;
@@ -131,7 +134,9 @@ export async function POST(req: NextRequest) {
             const currentTaskIndex = parseInt(taskId.replace('task', '')) - 1;
             if (!isNaN(currentTaskIndex) && team.progress === currentTaskIndex) {
                 team.progress += 1;
-                await (team as any).save();
+                if ('save' in team && typeof team.save === 'function') {
+                    await (team as any).save();
+                }
             }
         }
 

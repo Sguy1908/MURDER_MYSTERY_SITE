@@ -1,17 +1,4 @@
-/**
- * Shared frontend helper to verify GhostID answers via the backend API.
- * Import this in any task component that needs answer verification.
- */
-
-export interface VerifyResult {
-    correct: boolean;
-    displayAnswer?: string;
-    successMessage?: string;
-    failureMessage?: string;
-    nextQuestionId?: string | null;
-    completed?: boolean;
-    error?: string;
-}
+import { VerifyResult } from "@/app/types";
 
 export async function verifyGhostAnswer(
     taskId: string,

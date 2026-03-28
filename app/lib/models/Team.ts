@@ -1,11 +1,5 @@
 import mongoose from "mongoose";
-
-export interface ITeam extends mongoose.Document {
-    username: string;
-    progress: number;
-    isDisqualified: boolean;
-    lastAttempt?: Date;
-}
+import { ITeam } from "@/app/types";
 
 const TeamSchema = new mongoose.Schema<ITeam>({
     username: {

@@ -1,10 +1,9 @@
 'use client'
-//ts-ignore
 import { useState, useEffect, useRef, useCallback } from "react";
 import { verifyGhostAnswer } from "@/app/lib/verifyGhostAnswer";
+import { ChatMessage, VerifyResult } from "@/app/types";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-
 interface Feed {
     id: string;
     cameraName: string;
@@ -32,13 +31,6 @@ interface Riddle {
     hint: string;
     answer: string;
     explanation: string;
-}
-
-interface GhostMessage {
-    id: number;
-    text: string;
-    label: string;
-    isUser: boolean;
 }
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
@@ -132,32 +124,42 @@ const QS: Question[] = [
     },
 ];
 
-const RIDDLES: Riddle[] = [
-    { type: "jumble", label: "CODE_JUMBLE", challenge: "Unjumble this programming term:\n\n  ► LORCEPOMI", hint: "It translates source code into machine code.", answer: "compiler", explanation: "LORCEPOMI → COMPILER — translates high-level code to machine instructions." },
-    { type: "riddle", label: "LOGIC_RIDDLE", challenge: "I have branches but no leaves,\ncommits but no crimes,\nand a HEAD that never thinks.\nWhat am I?", hint: "Developers push and pull from me daily.", answer: "git", explanation: "GIT — a version control system with branches, commits, and a HEAD pointer." },
-    { type: "decode", label: "HEX_DECODE", challenge: "Decode this hex sequence:\n\n  ► 4C 4F 4F 50", hint: "Every programmer uses this construct to repeat actions.", answer: "loop", explanation: "4C→L  4F→O  4F→O  50→P  →  LOOP" },
-    { type: "jumble", label: "CODE_JUMBLE", challenge: "Unjumble this programming term:\n\n  ► UECQNEE", hint: "Data structures store elements in this ordered form.", answer: "sequence", explanation: "UECQNEE → SEQUENCE — an ordered list of elements." },
-    { type: "riddle", label: "LOGIC_RIDDLE", challenge: "I store your data in key-value pairs,\nI am neither a list nor a tree,\nPython calls me a dict,\nJavaScript calls me an object.\nWhat am I?", hint: "Think hash tables.", answer: "hashmap", explanation: "HASHMAP — a key-value data structure, known as dict in Python." },
-    { type: "decode", label: "BINARY_DECODE", challenge: "Decode this binary:\n\n  ► 01000010 01010101 01000111", hint: "Developers hunt these in their code every day.", answer: "bug", explanation: "01000010→B  01010101→U  01000111→G  →  BUG" },
-    { type: "jumble", label: "CODE_JUMBLE", challenge: "Unjumble this programming term:\n\n  ► RIOITNMHGAL", hint: "A step-by-step procedure for solving a problem.", answer: "algorithm", explanation: "RIOITNMHGAL → ALGORITHM — a defined set of steps to solve a problem." },
-    { type: "riddle", label: "LOGIC_RIDDLE", challenge: "I wrap your code in a safety net,\nI catch what others throw,\nWithout me your program crashes,\nWith me, errors flow.\nWhat am I?", hint: "try { } ___ { }", answer: "catch", explanation: "CATCH — the block that handles exceptions thrown by try blocks." },
-    { type: "decode", label: "HEX_DECODE", challenge: "Decode this hex sequence:\n\n  ► 4E 55 4C 4C", hint: "The value that represents the absence of a value.", answer: "null", explanation: "4E→N  55→U  4C→L  4C→L  →  NULL" },
-    { type: "jumble", label: "CODE_JUMBLE", challenge: "Unjumble this programming term:\n\n  ► ONKTEECAPTLINAS", hint: "OOP principle of bundling data and methods together.", answer: "encapsulation", explanation: "ONKTEECAPTLINAS → ENCAPSULATION — hiding internal state in OOP." },
-    { type: "riddle", label: "LOGIC_RIDDLE", challenge: "I am a function that calls itself,\nI have a base case or I run forever,\nFibonacci loves me,\nStack overflow fears me.\nWhat am I?", hint: "Think: f(n) = f(n-1) + f(n-2)", answer: "recursion", explanation: "RECURSION — a function that calls itself until a base case is reached." },
-    { type: "decode", label: "BINARY_DECODE", challenge: "Decode this binary:\n\n  ► 01000001 01010000 01001001", hint: "How applications talk to each other over the web.", answer: "api", explanation: "01000001→A  01010000→P  01001001→I  →  API" },
-    { type: "jumble", label: "CODE_JUMBLE", challenge: "Unjumble this programming term:\n\n  ► LYOIMHOPRSMP", hint: "OOP concept: one interface, many forms.", answer: "polymorphism", explanation: "LYOIMHOPRSMP → POLYMORPHISM — many forms for the same interface." },
-    { type: "riddle", label: "LOGIC_RIDDLE", challenge: "I live in RAM, I grow and shrink,\nI follow LIFO rules strictly,\nFunctions push onto me,\nand pop off when done.\nWhat am I?", hint: "Last in, first out.", answer: "stack", explanation: "STACK — a LIFO data structure used for function call management." },
-    { type: "decode", label: "HEX_DECODE", challenge: "Decode this hex sequence:\n\n  ► 48 45 41 50", hint: "Dynamic memory allocation happens here.", answer: "heap", explanation: "48→H  45→E  41→A  50→P  →  HEAP" },
-    { type: "jumble", label: "CODE_JUMBLE", challenge: "Unjumble this programming term:\n\n  ► TRAABIOSCTN", hint: "Hiding complexity and exposing only essential features.", answer: "abstraction", explanation: "TRAABIOSCTN → ABSTRACTION — simplifying complex systems." },
-    { type: "riddle", label: "LOGIC_RIDDLE", challenge: "I am true or false, one or zero,\nGeorge Boole invented my logic,\nAND, OR, NOT — these are my gates.\nWhat am I?", hint: "Think: boolean.", answer: "boolean", explanation: "BOOLEAN — a data type with only two values: true or false." },
-    { type: "decode", label: "BINARY_DECODE", challenge: "Decode this binary:\n\n  ► 01010011 01010001 01001100", hint: "Language used to query relational databases.", answer: "sql", explanation: "01010011→S  01010001→Q  01001100→L  →  SQL" },
-    { type: "riddle", label: "LOGIC_RIDDLE", challenge: "I connect your app to the internet,\nI have a number from 0 to 65535,\n80 is for HTTP, 443 for HTTPS.\nWhat am I?", hint: "Network traffic enters and exits through me.", answer: "port", explanation: "PORT — a numerical endpoint for network communication (0–65535)." },
-    { type: "decode", label: "HEX_DECODE", challenge: "Decode this hex sequence:\n\n  ► 43 4F 44 45", hint: "What you write all day long.", answer: "code", explanation: "43→C  4F→O  44→D  45→E  →  CODE" },
-    { type: "jumble", label: "CODE_JUMBLE", challenge: "Unjumble this programming term:\n\n  ► NTITROEAIR", hint: "Repeating a process — like a for loop.", answer: "iteration", explanation: "NTITROEAIR → ITERATION — repeating a sequence of instructions." },
-    { type: "riddle", label: "LOGIC_RIDDLE", challenge: "I am a contract between classes,\nI have no body, only signatures,\nJava and TypeScript love me.\nWhat am I?", hint: "Think: implements ___", answer: "interface", explanation: "INTERFACE — a contract defining method signatures without implementation." },
-    { type: "decode", label: "BINARY_DECODE", challenge: "Decode this binary:\n\n  ► 01001011 01000101 01011001", hint: "Cryptography and maps both use this concept.", answer: "key", explanation: "01001011→K  01000101→E  01011001→Y  →  KEY" },
-    { type: "jumble", label: "CODE_JUMBLE", challenge: "Unjumble this programming term:\n\n  ► LBREAIAV", hint: "A named storage location in memory.", answer: "variable", explanation: "LBREAIAV → VARIABLE — a named container that holds a value." },
-];
+const RIDDLE_DATA: Record<number, Riddle> = {
+    1: { type: "jumble", label: "CODE_JUMBLE", challenge: "Unjumble this programming term:\n\n  ► LORCEPOMI", hint: "It translates source code into machine code.", answer: "compiler", explanation: "LORCEPOMI → COMPILER — translates high-level code to machine instructions." },
+    2: { type: "riddle", label: "LOGIC_RIDDLE", challenge: "I have branches but no leaves,\ncommits but no crimes,\nand a HEAD that never thinks.\nWhat am I?", hint: "Developers push and pull from me daily.", answer: "git", explanation: "GIT — a version control system with branches, commits, and a HEAD pointer." },
+    3: { type: "decode", label: "HEX_DECODE", challenge: "Decode this hex sequence:\n\n  ► 4C 4F 4F 50", hint: "Every programmer uses this construct to repeat actions.", answer: "loop", explanation: "4C→L  4F→O  4F→O  50→P  →  LOOP" },
+    4: { type: "jumble", label: "CODE_JUMBLE", challenge: "Unjumble this programming term:\n\n  ► UECQNEE", hint: "Data structures store elements in this ordered form.", answer: "sequence", explanation: "UECQNEE → SEQUENCE — an ordered list of elements." },
+    5: { type: "riddle", label: "LOGIC_RIDDLE", challenge: "I store your data in key-value pairs,\nI am neither a list nor a tree,\nPython calls me a dict,\nJavaScript calls me an object.\nWhat am I?", hint: "Think hash tables.", answer: "hashmap", explanation: "HASHMAP — a key-value data structure, known as dict in Python." },
+    6: { type: "decode", label: "BINARY_DECODE", challenge: "Decode this binary:\n\n  ► 01000010 01010101 01000111", hint: "Developers hunt these in their code every day.", answer: "bug", explanation: "01000010→B  01010101→U  01000111→G  →  BUG" },
+    7: { type: "jumble", label: "CODE_JUMBLE", challenge: "Unjumble this programming term:\n\n  ► RIOITNMHGAL", hint: "A step-by-step procedure for solving a problem.", answer: "algorithm", explanation: "RIOITNMHGAL → ALGORITHM — a defined set of steps to solve a problem." },
+    8: { type: "riddle", label: "LOGIC_RIDDLE", challenge: "I wrap your code in a safety net,\nI catch what others throw,\nWithout me your program crashes,\nWith me, errors flow.\nWhat am I?", hint: "try { } ___ { }", answer: "catch", explanation: "CATCH — the block that handles exceptions thrown by try blocks." },
+    9: { type: "decode", label: "HEX_DECODE", challenge: "Decode this hex sequence:\n\n  ► 4E 55 4C 4C", hint: "The value that represents the absence of a value.", answer: "null", explanation: "4E→N  55→U  4C→L  4C→L  →  NULL" },
+    10: { type: "jumble", label: "CODE_JUMBLE", challenge: "Unjumble this programming term:\n\n  ► ONKTEECAPTLINAS", hint: "OOP principle of bundling data and methods together.", answer: "encapsulation", explanation: "ONKTEECAPTLINAS → ENCAPSULATION — hiding internal state in OOP." },
+    11: { type: "riddle", label: "LOGIC_RIDDLE", challenge: "I am a function that calls itself,\nI have a base case or I run forever,\nFibonacci loves me,\nStack overflow fears me.\nWhat am I?", hint: "Think: f(n) = f(n-1) + f(n-2)", answer: "recursion", explanation: "RECURSION — a function that calls itself until a base case is reached." },
+    12: { type: "decode", label: "BINARY_DECODE", challenge: "Decode this binary:\n\n  ► 01000001 01010000 01001001", hint: "How applications talk to each other over the web.", answer: "api", explanation: "01000001→A  01010000→P  01001001→I  →  API" },
+    13: { type: "jumble", label: "CODE_JUMBLE", challenge: "Unjumble this programming term:\n\n  ► LYOIMHOPRSMP", hint: "OOP concept: one interface, many forms.", answer: "polymorphism", explanation: "LYOIMHOPRSMP → POLYMORPHISM — many forms for the same interface." },
+    14: { type: "riddle", label: "LOGIC_RIDDLE", challenge: "I live in RAM, I grow and shrink,\nI follow LIFO rules strictly,\nFunctions push onto me,\nand pop off when done.\nWhat am I?", hint: "Last in, first out.", answer: "stack", explanation: "STACK — a LIFO data structure used for function call management." },
+    15: { type: "decode", label: "HEX_DECODE", challenge: "Decode this hex sequence:\n\n  ► 48 45 41 51", hint: "Dynamic memory allocation happens here.", answer: "heap", explanation: "48→H  45→E  41→A  51→Q  →  HEAP" },
+    16: { type: "jumble", label: "CODE_JUMBLE", challenge: "Unjumble this programming term:\n\n  ► TRAABIOSCTN", hint: "Hiding complexity and exposing only essential features.", answer: "abstraction", explanation: "TRAABIOSCTN → ABSTRACTION — simplifying complex systems." },
+    17: { type: "riddle", label: "LOGIC_RIDDLE", challenge: "I am true or false, one or zero,\nGeorge Boole invented my logic,\nAND, OR, NOT — these are my gates.\nWhat am I?", hint: "Think: boolean.", answer: "boolean", explanation: "BOOLEAN — a data type with only two values: true or false." },
+    18: { type: "decode", label: "BINARY_DECODE", challenge: "Decode this binary:\n\n  ► 01010011 01010001 01001100", hint: "Language used to query relational databases.", answer: "sql", explanation: "01010011→S  01010001→Q  01001100→L  →  SQL" },
+    19: { type: "riddle", label: "LOGIC_RIDDLE", challenge: "I connect your app to the internet,\nI have a number from 0 to 65535,\n80 is for HTTP, 443 for HTTPS.\nWhat am I?", hint: "Network traffic enters and exits through me.", answer: "port", explanation: "PORT — a numerical endpoint for network communication (0–65535)." },
+    20: { type: "decode", label: "HEX_DECODE", challenge: "Decode this hex sequence:\n\n  ► 43 4F 44 45", hint: "What you write all day long.", answer: "code", explanation: "43→C  4F→O  44→D  45→E  →  CODE" },
+    21: { type: "jumble", label: "CODE_JUMBLE", challenge: "Unjumble this programming term:\n\n  ► NTITROEAIR", hint: "Repeating a process — like a for loop.", answer: "iteration", explanation: "NTITROEAIR → ITERATION — repeating a sequence of instructions." },
+    22: { type: "riddle", label: "LOGIC_RIDDLE", challenge: "I am a contract between classes,\nI have no body, only signatures,\nJava and TypeScript love me.\nWhat am I?", hint: "Think: implements ___", answer: "interface", explanation: "INTERFACE — a contract defining method signatures without implementation." },
+    23: { type: "decode", label: "BINARY_DECODE", challenge: "Decode this binary:\n\n  ► 01001011 01000101 01011001", hint: "Cryptography and maps both use this concept.", answer: "key", explanation: "01001011→K  01000101→E  01011001→Y  →  KEY" },
+    24: { type: "jumble", label: "CODE_JUMBLE", challenge: "Unjumble this programming term:\n\n  ► LBREAIAV", hint: "A named storage location in memory.", answer: "variable", explanation: "LBREAIAV → VARIABLE — a named container that holds a value." },
+};
+
+const FALLBACK_RIDDLE: Riddle = {
+    type: "riddle",
+    label: "SYSTEM_ERROR",
+    challenge: "Node integrity compromised. Manual override required.",
+    hint: "The answer is 'override'.",
+    answer: "override",
+    explanation: "Fallback riddle for missing logic nodes."
+};
+
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -173,8 +175,8 @@ function posPercent(t: string): number {
 }
 
 function getRiddle(feedId: string): Riddle {
-    const idx = parseInt(feedId.replace("EX-", ""), 10);
-    return RIDDLES[(idx - 1) % RIDDLES.length];
+    const num = parseInt(feedId.replace("Lab-", ""), 10);
+    return RIDDLE_DATA[num] || FALLBACK_RIDDLE;
 }
 
 // ─── Ghost SVG ────────────────────────────────────────────────────────────────
@@ -694,7 +696,7 @@ function Modal({ feed, onClose }: { feed: Feed; onClose: () => void }) {
 // ─── Ghost Sidebar ────────────────────────────────────────────────────────────
 
 function GhostSidebar({ onClose, onAllDone }: { onClose: () => void; onAllDone: () => void }) {
-    const [messages, setMessages] = useState<GhostMessage[]>([]);
+    const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [input, setInput] = useState("");
     const [typing, setTyping] = useState(false);
     const [qIdx, setQIdx] = useState(0);
@@ -733,7 +735,7 @@ function GhostSidebar({ onClose, onAllDone }: { onClose: () => void; onAllDone: 
         const q = QS[qIdx]; if (!q) return;
 
         setTyping(true);
-        const result = await verifyGhostAnswer('task2', q.qId, val);
+        const result: VerifyResult = await verifyGhostAnswer('task2', q.qId, val);
         setTyping(false);
 
         if (result.correct) {

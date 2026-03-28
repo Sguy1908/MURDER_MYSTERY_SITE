@@ -1,25 +1,7 @@
 'use client'
 import { useState, useEffect, useRef, useCallback } from "react";
 
-// ─── Types ───────────────────────────────────────────────────────────────────
-
-type TaskStatus = "completed" | "active" | "locked";
-
-interface Task {
-  id: number;
-  name: string;
-  fullName: string;
-  desc: string;
-  status: TaskStatus;
-  linkedFile?: string;
-}
-
-interface ChatMessage {
-  id: string;
-  role: "ghost" | "user" | "query" | "hint";
-  text: string;
-  hintNote?: string;
-}
+import { Task, TaskStatus, ChatMessage } from "@/app/types";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 

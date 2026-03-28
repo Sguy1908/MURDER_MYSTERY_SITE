@@ -1,20 +1,21 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { connectDB } from "./db";
-import { Team, ITeam } from "./models/Team";
+import { Team } from "./models/Team";
+import { ITeam, JWTPayload } from "@/app/types";
 
 const JWT_SECRET = process.env.JWT_SECRET || "SUPER_SECRET_FALLBACK_KEY_MURDER_MYSTERY_2026";
 const key = new TextEncoder().encode(JWT_SECRET);
 
-export async function encrypt(payload: any) {
-    return await new SignJWT(payload)
+export async function encrypt(payload: JWTPayload) {
+    return await new SignJWT(payload as any) // jose requires JWTPayload but my interface is custom
         .setProtectedHeader({ alg: "HS256" })
         .setIssuedAt()
         .setExpirationTime("24h")
         .sign(key);
 }
 
-export async function decrypt(input: string): Promise<any> {
+export async function decrypt(input: string): Promise<JWTPayload> {
     const { payload } = await jwtVerify(input, key, {
         algorithms: ["HS256"],
     });

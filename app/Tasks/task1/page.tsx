@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useRef, useCallback } from "react";
+import { ChatMessage, VerifyResult } from "@/app/types";
 import { verifyGhostAnswer } from "@/app/lib/verifyGhostAnswer";
 
 // ── TYPES ────────────────────────────────────────────────────────────────────
@@ -8,8 +9,6 @@ interface EndpointRow { user: string; time: string; action: string; xfer: string
 interface VpnRow { user: string; time: string; tunnel: string; }
 interface CombinedRow { user: string; loginTime: string; fileAccessed: string; }
 interface Question { q: string; hint: string; qId: string; stId: string; }
-interface ChatMsg { id: number; label?: string; body: string; isUser?: boolean; isTyping?: boolean; }
-interface IntroMsg { id: number; label?: string; body: string; show: boolean; isTyping?: boolean; }
 type QStatus = "pending" | "ok" | "fail";
 
 // ── DATA ─────────────────────────────────────────────────────────────────────
@@ -197,7 +196,7 @@ const TypingDots = () => (
 // ── INTRO MODAL ───────────────────────────────────────────────────────────────
 interface IntroModalProps { onDismiss: () => void; }
 const IntroModal = ({ onDismiss }: IntroModalProps) => {
-  const [messages, setMessages] = useState<IntroMsg[]>([]);
+  const [messages, setMessages] = useState<(ChatMessage & { show?: boolean })[]>([]);
   const [showBtn, setShowBtn] = useState(false);
   const logRef = useRef<HTMLDivElement>(null);
   const idRef = useRef(0);
@@ -206,7 +205,7 @@ const IntroModal = ({ onDismiss }: IntroModalProps) => {
 
   const addTyping = useCallback((): number => {
     const id = ++idRef.current;
-    setMessages(m => [...m, { id, isTyping: true, body: "", show: true }]);
+    setMessages(m => [...m, { id, isTyping: true, text: "", show: true }]);
     return id;
   }, []);
 
@@ -214,9 +213,9 @@ const IntroModal = ({ onDismiss }: IntroModalProps) => {
     setMessages(m => m.filter(x => x.id !== id));
   }, []);
 
-  const addCard = useCallback((label: string | undefined, body: string) => {
+  const addCard = useCallback((label: string | undefined, text: string) => {
     const id = ++idRef.current;
-    setMessages(m => [...m, { id, label, body, show: false }]);
+    setMessages(m => [...m, { id, label, text, show: false }]);
     setTimeout(() => setMessages(m => m.map(x => x.id === id ? { ...x, show: true } : x)), 50);
   }, []);
 
@@ -266,7 +265,7 @@ const IntroModal = ({ onDismiss }: IntroModalProps) => {
           ) : (
             <div key={msg.id} style={{ background: "#0e2236", border: "1px solid #1a3550", borderRadius: 6, padding: "12px 14px", opacity: msg.show ? 1 : 0, transform: msg.show ? "none" : "translateY(8px)", transition: "opacity 0.4s ease, transform 0.4s ease" }}>
               {msg.label && <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: 2, color: "#00d4c8", textTransform: "uppercase", marginBottom: 8, opacity: 0.8 }}>{msg.label}</div>}
-              <div style={{ fontSize: 12, color: "#c8dce8", lineHeight: 1.7 }}>{msg.body}</div>
+              <div style={{ fontSize: 12, color: "#c8dce8", lineHeight: 1.7 }}>{msg.text}</div>
             </div>
           ))}
         </div>
@@ -290,7 +289,7 @@ interface GhostPanelProps {
   onAllDone: () => void;
 }
 const GhostPanel = ({ open, onClose, qStatuses, onQStatusChange, onAllDone }: GhostPanelProps) => {
-  const [messages, setMessages] = useState<ChatMsg[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [qIdx, setQIdx] = useState(0);
   const [done, setDone] = useState(false);
@@ -306,14 +305,14 @@ const GhostPanel = ({ open, onClose, qStatuses, onQStatusChange, onAllDone }: Gh
     if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight;
   }, [messages]);
 
-  const addMsg = useCallback((label: string | undefined, body: string, isUser = false) => {
+  const addMsg = useCallback((label: string | undefined, text: string, isUser = false) => {
     const id = ++idRef.current;
-    setMessages(m => [...m, { id, label, body, isUser }]);
+    setMessages(m => [...m, { id, label, text, isUser }]);
   }, []);
 
   const addTyping = useCallback((): number => {
     const id = ++idRef.current;
-    setMessages(m => [...m, { id, body: "", isTyping: true }]);
+    setMessages(m => [...m, { id, text: "", isTyping: true }]);
     return id;
   }, []);
 
@@ -363,7 +362,7 @@ const GhostPanel = ({ open, onClose, qStatuses, onQStatusChange, onAllDone }: Gh
     const q = QUESTIONS[qIdx];
     await delay(200);
     const tid = addTyping(); await delay(600); removeTyping(tid);
-    const result = await verifyGhostAnswer('task1', q.qId, val);
+    const result: VerifyResult = await verifyGhostAnswer('task1', q.qId, val);
     if (result.correct) {
       addMsg(undefined, result.successMessage || `✓ Confirmed — ${result.displayAnswer}`);
       onQStatusChange(qIdx, "ok");
@@ -404,12 +403,12 @@ const GhostPanel = ({ open, onClose, qStatuses, onQStatusChange, onAllDone }: Gh
           <div key={msg.id} style={{ background: "#0e2236", border: "1px solid #1a3550", borderRadius: 6, padding: "12px 14px" }}><TypingDots /></div>
         ) : msg.isUser ? (
           <div key={msg.id} style={{ background: "#0d1e30", border: "1px solid #1e4060", borderLeft: "3px solid #00d4c8", borderRadius: 6, padding: "12px 14px" }}>
-            <div style={{ fontSize: 12, color: "#00d4c8", lineHeight: 1.65 }}>{msg.body}</div>
+            <div style={{ fontSize: 12, color: "#00d4c8", lineHeight: 1.65 }}>{msg.text}</div>
           </div>
         ) : (
           <div key={msg.id} style={{ background: "#0e2236", border: "1px solid #1a3550", borderRadius: 6, padding: "12px 14px" }}>
             {msg.label && <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: 2, color: "#00d4c8", textTransform: "uppercase", marginBottom: 8, opacity: 0.8 }}>{msg.label}</div>}
-            <div style={{ fontSize: 12, color: "#c8dce8", lineHeight: 1.65, fontStyle: !msg.label && msg.body.startsWith("Cross") || msg.body.startsWith("Check") || msg.body.startsWith("Filter") ? "italic" : "normal", opacity: !msg.label && (msg.body.startsWith("Cross") || msg.body.startsWith("Check") || msg.body.startsWith("Filter")) ? 0.6 : 1 }}>{msg.body}</div>
+            <div style={{ fontSize: 12, color: "#c8dce8", lineHeight: 1.65, fontStyle: !msg.label && msg.text.startsWith("Cross") || msg.text.startsWith("Check") || msg.text.startsWith("Filter") ? "italic" : "normal", opacity: !msg.label && (msg.text.startsWith("Cross") || msg.text.startsWith("Check") || msg.text.startsWith("Filter")) ? 0.6 : 1 }}>{msg.text}</div>
           </div>
         ))}
       </div>

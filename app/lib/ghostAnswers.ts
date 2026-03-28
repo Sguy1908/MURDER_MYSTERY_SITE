@@ -5,28 +5,7 @@
  * All answer data lives exclusively on the server.
  */
 
-// ── Types ────────────────────────────────────────────────────────────────────
-
-export interface QuestionDef {
-    questionId: string;
-    /** How to match the user's answer */
-    matchMode: 'exact' | 'includes';
-    /** Acceptable answers (lowercased, trimmed) */
-    acceptableAnswers: string[];
-    /** Canonical display answer (shown on success) */
-    displayAnswer: string;
-    /** Message sent on correct answer */
-    successMessage: string;
-    /** Message sent on wrong answer */
-    failureMessage: string;
-    /** Next question id, or null if this is the last */
-    nextQuestionId: string | null;
-}
-
-export interface TaskDef {
-    taskId: string;
-    questions: QuestionDef[];
-}
+import { QuestionDef, TaskDef } from "@/app/types";
 
 // ── Answer Registry ──────────────────────────────────────────────────────────
 
