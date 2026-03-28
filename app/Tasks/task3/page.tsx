@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 const Task3CodeAudit: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -1103,7 +1103,7 @@ const Task3CodeAudit: React.FC = () => {
           <div style={{ background: "#0a0505", border: "1px solid #c0392b", padding: "40px", borderRadius: "4px", textAlign: "center", maxWidth: "400px", boxShadow: "0 0 40px rgba(192,57,43,0.2)" }}>
             <h2 style={{ color: "#ff3b2a", fontSize: "24px", letterSpacing: "3px", textTransform: "uppercase", marginBottom: "16px", textShadow: "0 0 20px rgba(255,59,42,0.5)", fontFamily: "'Share Tech Mono', monospace" }}>Task Complete</h2>
             <p style={{ color: "#e8c8c8", fontSize: "14px", marginBottom: "32px", lineHeight: "1.6", fontFamily: "'Share Tech Mono', monospace" }}>Code audit is complete. Telemetry module is unlocked. Return to the dashboard to proceed.</p>
-            <a href="/dashboard" style={{ display: "inline-block", background: "transparent", border: "1px solid #c0392b", color: "#ff3b2a", textDecoration: "none", padding: "12px 24px", fontSize: "12px", fontWeight: "bold", letterSpacing: "2px", cursor: "pointer", transition: "all 0.3s", fontFamily: "'Share Tech Mono', monospace" }} onMouseOver={(e: any) => { e.currentTarget.style.background = "rgba(192,57,43,0.1)"; }} onMouseOut={(e: any) => { e.currentTarget.style.background = "transparent"; }}>RETURN TO DASHBOARD</a>
+            <a href="/dashboard" style={{ display: "inline-block", background: "transparent", border: "1px solid #c0392b", color: "#ff3b2a", textDecoration: "none", padding: "12px 24px", fontSize: "12px", fontWeight: "bold", letterSpacing: "2px", cursor: "pointer", transition: "all 0.3s", fontFamily: "'Share Tech Mono', monospace" }} onMouseOver={(e: React.MouseEvent<HTMLAnchorElement>) => { e.currentTarget.style.background = "rgba(192,57,43,0.1)"; }} onMouseOut={(e: React.MouseEvent<HTMLAnchorElement>) => { e.currentTarget.style.background = "transparent"; }}>RETURN TO DASHBOARD</a>
           </div>
         </div>
       )}

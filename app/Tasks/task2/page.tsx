@@ -904,8 +904,8 @@ function MainApp() {
                         <h2 className="sf" style={{ color: "#fff", fontSize: "24px", letterSpacing: "3px", textTransform: "uppercase", marginBottom: "16px", textShadow: "0 0 20px rgba(230,0,0,0.5)" }}>Task Complete</h2>
                         <p style={{ color: "#dcd4c3", fontSize: "14px", marginBottom: "32px", lineHeight: "1.6" }}>CCTV analysis is complete. The anomaly has been identified. Return to the dashboard to proceed.</p>
                         <a href="/dashboard" className="sf" style={{ display: "inline-block", background: "transparent", border: "1px solid #e60000", color: "#e60000", textDecoration: "none", padding: "12px 24px", fontSize: "12px", fontWeight: "bold", letterSpacing: "2px", cursor: "pointer", transition: "all 0.3s" }}
-                            onMouseOver={(e: any) => { e.currentTarget.style.background = "rgba(230,0,0,0.1)"; }}
-                            onMouseOut={(e: any) => { e.currentTarget.style.background = "transparent"; }}
+                            onMouseOver={(e: React.MouseEvent<HTMLAnchorElement>) => { e.currentTarget.style.background = "rgba(230,0,0,0.1)"; }}
+                            onMouseOut={(e: React.MouseEvent<HTMLAnchorElement>) => { e.currentTarget.style.background = "transparent"; }}
                         >RETURN TO DASHBOARD</a>
                     </div>
                 </div>

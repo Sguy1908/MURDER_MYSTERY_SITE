@@ -333,7 +333,7 @@ const GhostPanel = ({ open, onClose, qStatuses, onQStatusChange, onAllDone }: Gh
     setAwaitingAnswer(true);
     addMsg("ghost41_id › QUERY", q.q);
     const id = ++idRef.current;
-    setMessages(m => [...m, { id, body: q.hint, label: undefined, isUser: false }]);
+    setMessages(m => [...m, { id, text: q.hint, label: undefined, isUser: false }]);
   }, [addMsg, addTyping, removeTyping, onAllDone]);
 
   useEffect(() => {

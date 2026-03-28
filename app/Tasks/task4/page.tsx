@@ -1,9 +1,7 @@
 'use client'
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { verifyGhostAnswer } from '@/app/lib/verifyGhostAnswer';
-
-// ─── TYPES ────────────────────────────────────────────────────────────────────
-interface ChatMsg { id: number; label?: string; body: string; isUser?: boolean; isTyping?: boolean; }
+import { ChatMessage, VerifyResult } from '@/app/types';
 
 const Task4Telemetry: React.FC = () => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -12,7 +10,7 @@ const Task4Telemetry: React.FC = () => {
   const [deviceIdStatus, setDeviceIdStatus] = useState({ text: '', isError: false });
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
-  const [chatMessages, setChatMessages] = useState<ChatMsg[]>([]);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatInput, setChatInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [t4Complete, setT4Complete] = useState(false);
@@ -132,7 +130,7 @@ const Task4Telemetry: React.FC = () => {
 
   const initChat = async () => {
     const delay = (ms: number) => new Promise(r => setTimeout(r, ms));
-    const addGhostMsg = (body: string) => setChatMessages((prev: ChatMsg[]) => [...prev, { id: Date.now() + Math.random(), label: 'GhostID_41', body }]);
+    const addGhostMsg = (text: string) => setChatMessages((prev: ChatMessage[]) => [...prev, { id: Date.now() + Math.random(), label: 'GhostID_41', text }]);
 
     setIsTyping(true); await delay(800); setIsTyping(false);
     addGhostMsg('Task 4 — Chip Telemetry.');
@@ -148,13 +146,13 @@ const Task4Telemetry: React.FC = () => {
     if (!chatInput.trim() || isTyping) return;
     const val = chatInput.trim();
     setChatInput('');
-    setChatMessages((prev: ChatMsg[]) => [...prev, { id: Date.now(), body: val, isUser: true }]);
+    setChatMessages((prev: ChatMessage[]) => [...prev, { id: Date.now(), text: val, isUser: true }]);
 
     if (!deviceIdUnlocked) {
       setIsTyping(true);
       setTimeout(() => {
         setIsTyping(false);
-        setChatMessages((prev: ChatMsg[]) => [...prev, { id: Date.now(), label: 'GhostID_41', body: 'Authenticate the device first. Navigate to the Encoded Output tab and enter the Device ID.' }]);
+        setChatMessages((prev: ChatMessage[]) => [...prev, { id: Date.now(), label: 'GhostID_41', text: 'Authenticate the device first. Navigate to the Encoded Output tab and enter the Device ID.' }]);
       }, 700);
       return;
     }
@@ -164,10 +162,10 @@ const Task4Telemetry: React.FC = () => {
     setIsTyping(false);
 
     if (result.correct) {
-      setChatMessages((prev: ChatMsg[]) => [...prev, { id: Date.now(), label: 'GhostID_41', body: result.successMessage || '21:15. Confirmed.\nThe system failure and the lab incident happened at the same time.\nMovement forensics unlocked.' }]);
+      setChatMessages((prev: ChatMessage[]) => [...prev, { id: Date.now(), label: 'GhostID_41', text: result.successMessage || '21:15. Confirmed.\nThe system failure and the lab incident happened at the same time.\nMovement forensics unlocked.' }]);
       handleAllDone();
     } else {
-      setChatMessages((prev: ChatMsg[]) => [...prev, { id: Date.now(), label: 'GhostID_41', body: result.failureMessage || 'Incorrect. Decode the Base64 string and enter the plaintext timestamp. Format: HH:MM' }]);
+      setChatMessages((prev: ChatMessage[]) => [...prev, { id: Date.now(), label: 'GhostID_41', text: result.failureMessage || 'Incorrect. Decode the Base64 string and enter the plaintext timestamp. Format: HH:MM' }]);
     }
   };
 
@@ -483,7 +481,7 @@ const Task4Telemetry: React.FC = () => {
           {chatMessages.map(msg => (
             <div key={msg.id} className={`t4-chat-msg ${msg.isUser ? 'user-msg' : 'ghost'}`}>
               {!msg.isUser && msg.label && <div style={{ fontSize: '8px', letterSpacing: '2px', color: 'var(--red-dim)', marginBottom: '4px' }}>{msg.label}</div>}
-              <div>{msg.body.split('\n').map((line, i) => <p key={i}>{line}</p>)}</div>
+              <div>{msg.text.split('\n').map((line, i) => <p key={i}>{line}</p>)}</div>
             </div>
           ))}
           {isTyping && (
@@ -515,8 +513,8 @@ const Task4Telemetry: React.FC = () => {
             <a
               href="/dashboard"
               style={{ display: "inline-block", background: "transparent", border: "1px solid #c0392b", color: "#ff3b2a", textDecoration: "none", padding: "12px 24px", fontSize: "12px", fontWeight: "bold", letterSpacing: "2px", cursor: "pointer", transition: "all 0.3s", fontFamily: "'Share Tech Mono', monospace" }}
-              onMouseOver={(e: any) => { e.currentTarget.style.background = "rgba(192,57,43,0.1)"; }}
-              onMouseOut={(e: any) => { e.currentTarget.style.background = "transparent"; }}
+              onMouseOver={(e: React.MouseEvent<HTMLAnchorElement>) => { e.currentTarget.style.background = "rgba(192,57,43,0.1)"; }}
+              onMouseOut={(e: React.MouseEvent<HTMLAnchorElement>) => { e.currentTarget.style.background = "transparent"; }}
             >
               RETURN TO DASHBOARD
             </a>
